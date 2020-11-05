@@ -184,6 +184,13 @@
         </ul>
         <div class="creator_item" id="links">
           <div class="custom_container"><label>Links</label><button class="custom_btn" @click="beforeInput.customLink = !beforeInput.customLink">{{!beforeInput.customLink?'Custom Link':'Existed Link'}}</button></div>
+          <div class="links_container">
+            <ul>
+              <li v-for="(link, index) in links" :key="link.name">
+                {{ link.name }}  <button><i class="fas fa-times" @click="links.splice(index,1)"></i></button>
+              </li>
+            </ul>
+          </div>
           <template v-if="!beforeInput.customLink" >
             <select ref="link">
               <option value="siteName" disabled selected>SiteName</option>
@@ -210,19 +217,27 @@
         <button @click="expandation.expandEdu = !expandation.expandEdu"><i class="fas" :class="{'fa-plus':!expandation.expandEdu,'fa-minus':expandation.expandEdu}"></i></button>
       </div>
       <template v-if="expandation.expandEdu">
+        <div class="edu_container">
+          <ul>
+            <li v-for="(item, index) in eductionalInfo" :key="index">
+              {{ item.degree }}  <button><i class="fas fa-times" id="index" @click="eductionalInfo.splice(index,1)"></i></button>
+            </li>
+          </ul>
+        </div>
         <ul class="creator_list">
           <li class="creator_item">
             <label>Degree</label>
-            <input type="text" v-model="eductionalInfo.degree" @keypress="beforeInput.firstDegree = false">
+            <input type="text" ref="degree">
           </li>
           <li class="creator_item">
             <label>University</label>
-            <input type="text" v-model="eductionalInfo.university" @keypress="beforeInput.firstUniversity = false">
+            <input type="text" ref="university">
           </li>
           <li class="creator_item">
             <label>Faculty</label>
-            <input type="text" v-model="eductionalInfo.faculty" @keypress="beforeInput.firstFaculty = false">
+            <input type="text" ref="faculty">
           </li>
+          <button class="btn_main" @click="addEdu()">Add</button>
         </ul>
       </template>
       <div class="lang_header">
@@ -231,8 +246,8 @@
       </div>
       <template v-if="expandation.expandLang">
         <div class="lang_container">
-          <ul v-for="(lang, index) in languages" :key="lang">
-            <li>
+          <ul>
+            <li v-for="(lang, index) in languages" :key="lang">
               {{ lang.name }}  <button><i class="fas fa-times" id="index" @click="languages.splice(index,1)"></i></button>
             </li>
           </ul>
@@ -244,7 +259,13 @@
           </li>
           <li class="creator_item">
             <label>Level</label>
-            <input type="text" ref="level">
+            <select type="text" ref="level">
+              <option disabled>Select level</option>
+              <option value="native" selected>Native</option>
+              <option value="proficient">Proficient</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="basic">Basic</option>
+            </select>
           </li>
           <button class="btn_main" @click="addLang()">Add</button>
         </ul>
@@ -255,8 +276,8 @@
       </div>
       <template v-if="expandation.expandSkills">
         <div class="skills_container">
-          <ul v-for="(skill, index) in skills" :key="skill">
-            <li>
+          <ul>
+            <li v-for="(skill, index) in skills" :key="skill">
               {{ skill }}  <button><i class="fas fa-times" @click="skills.splice(index,1)"></i></button>
             </li>
           </ul>
@@ -275,8 +296,8 @@
       </div>
       <template v-if="expandation.expandProj">
         <div class="projects_container">
-          <ul v-for="(proj, index) in projects" :key="proj.name">
-            <li>
+          <ul>
+            <li v-for="(proj, index) in projects" :key="proj.name">
               {{ proj.name }}  <button><i class="fas fa-times" @click="projects.splice(index,1)"></i></button>
             </li>
           </ul>
@@ -297,10 +318,9 @@
           <button class="btn_main" @click="addProjects()">Add</button>
         </ul>
       </template>
-      <button class="btn_main" @click="download()">Download HTML</button>
-      <button class="btn_main" @click="generatePDF()">Download PDF</button>
+      <button class="btn_main download" @click="download()">Download HTML</button>
     </div>
-    <div class="resume_template">
+    <div class="resume_template" id="resume">
       <div class="container">
           <div class="header">
               <h1 class="name">
@@ -335,23 +355,28 @@
                           <span>Phone:</span> {{ personalInfo.phone }}
                       </li>
                       <li class="info_item">
-                          <span>E-mail:</span> <input type="text" id="mail" v-model="personalInfo.mail" readonly> <button v-if="personalInfo.mail" onclick="copyMail()" class="btn">copy</button>
+                          <span>E-mail:</span> {{personalInfo.mail}}
                       </li>
                   </ul>
               </div>
               <p class="info_item">
-                  <span>Find me online:</span> <span v-for="(link, index) in linksArr" :key="index" v-html="link"></span>
+                  <span>Find me online:</span> <span v-for="link in links" :key="link.name" v-html="link.tag"></span>
               </p>
           </div>
           <div class="flex">
               <div class="edu">
                   <h1>Education</h1>
-                  <h3 class="degree">{{ eductionalInfo.degree }}</h3>
-                  <h3 class="degree" v-if="beforeInput.firstDegree">Degree</h3>
-                  <p class="university">{{ eductionalInfo.university }}</p>
-                  <p class="university" v-if="beforeInput.firstUniversity">University</p>
-                  <p class="faculty">{{ eductionalInfo.faculty }}</p>
-                  <p class="faculty" v-if="beforeInput.firstFaculty">Faculty</p>
+                  <template v-if="beforeInput.firstEdu">
+                    <h3 class="degree">Degree</h3>
+                    <p class="university">University</p>
+                    <p class="faculty">Faculty</p>
+                  </template>
+                  <div v-for="item in eductionalInfo" :key="item.university">
+                    <h3 class="degree">{{item.degree}}</h3>
+                    <p class="university">{{ item.university }}</p>
+                    <p class="faculty">{{ item.faculty }}</p>
+                  </div>
+                  
               </div>
               <div class="lang">
                   <h1>Languages</h1>
@@ -361,17 +386,17 @@
                     </div>
                   </template>
                   <div v-if="beforeInput.firstLanguage">
-                      <h3>Language 1</h3>  <p>Native</p>
+                      <h3>Lang 1</h3>  <p>Native</p>
                   </div>
                   <div v-if="beforeInput.firstLanguage">
-                      <h3>Language 2</h3>  <p>Good</p>
+                      <h3>Lang 2</h3>  <p>Good</p>
                   </div>
               </div>
               <div class="skilles">
                   <h1>Skills</h1>
-                  <div class="skills_list">
-                      <ul v-for="skill in skills" :key="skill">
-                          <li class="skill">
+                  <div>
+                      <ul class="skills_list">
+                          <li class="skill"  v-for="skill in skills" :key="skill">
                               {{ skill }}
                           </li>
                       </ul>
@@ -451,23 +476,17 @@ export default {
         milStatus:'',
         marStatus:''
       },
-      eductionalInfo: {
-        degree:'',
-        university:'',
-        faculty:''
-      },
+      eductionalInfo: [],
       languages: [],
       skills: [],
       projects: [],
-      links: ['facebook', 'twitter', 'gitHub', 'codepen', 'linkedin', 'behance'],
-      linksArr:[],
+      existedLinks: ['facebook', 'twitter', 'gitHub', 'codepen', 'linkedin', 'behance'],
+      links:[],
       beforeInput: {
         firstProject: true,
         firstSkill: true,
         firstLanguage: true,
-        firstDegree: true,
-        firstUniversity: true,
-        firstFaculty: true,
+        firstEdu: true,
         firstName: true,
         firstPosition: true,
         customLink: false
@@ -479,7 +498,13 @@ export default {
         expandSkills: false,
         expandProj: false
       },
-      resumeStyle: `body{
+      resumeStyle: `
+      *{
+        margin:0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body{
       @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
         margin: 0;
         padding: 0;
@@ -629,47 +654,70 @@ export default {
       document.execCommand("copy");
       alert("E-mail Copied: " + mail.value);
     },
+    addEdu: function(){
+      const degree = this.$refs.degree.value,
+            university = this.$refs.university.value,
+            faculty = this.$refs.faculty.value
+      if(degree && degree.trim().length > 0 && university && university.trim().length > 0 && faculty && faculty.trim().length > 0 ){
+        const eduObj = {degree: degree, university: university, faculty: faculty}
+        this.eductionalInfo.push(eduObj)
+        this.beforeInput.firstEdu = false
+        this.$refs.degree.value = ''
+        this.$refs.university.value = ''
+        this.$refs.faculty.value = ''
+      }
+    },
     addLang: function(){
       const lang = this.$refs.lang.value,
-            level = this.$refs.level.value,
-            langObj = {name:lang, level:level}
-      this.languages.push(langObj)
-      this.$refs.lang.value = ''
-      this.$refs.level.value = ''
-      this.firstLanguage = false
+            level = this.$refs.level.value
+      if(lang && lang.trim().length > 0 && level && level.trim().length > 0 && level !== 'Select level'){
+        let langObj = {name:lang, level:level}
+        this.languages.push(langObj)
+        this.beforeInput.firstLanguage = false
+        this.$refs.lang.value = ''
+      }
+      this.$refs.level.value = 'Select level'
+      
     },
     addSkills: function(){
       const skill = this.$refs.skill.value
-      this.skills.push(skill)
+      if(skill && skill.trim().length > 0){
+        this.skills.push(skill)
+        this.beforeInput.firstSkill = false
+      }
       this.$refs.skill.value = ''
-      this.firstSkill = false
     },
     addProjects: function(){
       const name = this.$refs.projName.value,
             company = this.$refs.company.value,
-            desc = this.$refs.description.value,
-            projObj = {name: name, company: company, desc: desc}
-      this.projects.push(projObj)
+            desc = this.$refs.description.value
+      if( name && name.trim().length > 0 && company && company.trim().length > 0 && desc && desc.trim().length > 0){
+        let projObj = {name: name, company: company, desc: desc}
+        this.projects.push(projObj)
+        this.beforeInput.firstProject = false
+      }
       this.$refs.projName.value = ''
       this.$refs.company.value = ''
       this.$refs.description.value = ''
-      this.firstProject = false
     },
     addLinkTarget: function(){
       let siteName = this.$refs.link.value
-      let string = this.links.includes(siteName)?`<a href="${this.$refs.siteLink.value}" target="_blank" class="btn ${siteName}">${siteName}</a>`:''
-        this.linksArr.push(string)
-      this.$refs.link.value = 'siteName'
-      this.$refs.siteLink.value = ''
+      let target = this.$refs.siteLink.value
+      let string = this.existedLinks.includes(siteName)?`<a href="${target}" target="_blank" class="btn ${siteName}">${siteName}</a>`:''
+      if(string && string.length > 0 && target && target.trim().length > 0){
+        this.links.push({name: siteName, tag: string})
+        this.$refs.link.value = 'siteName'
+        this.$refs.siteLink.value = ''
+        }
     },
     addLinkCustom: function(){
       let siteName, siteLink, siteColor, string
       siteName = this.$refs.customSite.value
       siteLink = this.$refs.customSiteLink.value
       siteColor = this.$refs.customLinkColor.value
-      if(siteName && siteName !== ' ' && siteLink && siteLink !== ' '){
+      if(siteName && siteName.trim().length > 0 && siteLink && siteLink.trim().length > 0){
         string =`<a href="${siteLink}" target="_blank" class="btn" style="background: ${siteColor};">${siteName}</a>`
-        this.linksArr.push(string)
+        this.links.push({name: siteName, tag: string})
       }
       this.$refs.customSite.value = ''
       this.$refs.customSiteLink.value = ''
@@ -702,13 +750,7 @@ export default {
             window.URL.revokeObjectURL(url);  
         }, 0); 
       }
-    },
-    generatePDF: function() {
-        const element = document.querySelector('.resume_template');
-        html2pdf()
-          .from(element)
-          .save();
-      }
+    }
   }
 }
 </script>
@@ -754,6 +796,7 @@ input[type=number]::-webkit-outer-spin-button {
   .btn_main{
     width: fit-content;
     margin-left: 0.2em;
+    margin: auto;
     margin-bottom: 1em;
   } 
 }
@@ -843,17 +886,25 @@ input[type=number]::-webkit-outer-spin-button {
   }
 }
 #links{
+  width: 100%;
   .custom_container{
     display: flex;
     align-content: center;
     justify-content: center;
   }
+  ul{
+    margin: 0 !important;
+  }
   .custom_btn{
-  margin-right: 0;
+  margin-right: 1em;
   width: fit-content;
   margin-bottom: 1em;
   margin-top: 0;
   border-radius: 1em;
+  }
+  label{
+    margin-left: 2em;
+    margin-top: 0.3em;
   }
   input[type="color"] {
 	-webkit-appearance: none;
@@ -883,6 +934,7 @@ input[type="color"]::-webkit-color-swatch {
     width: 30%;
   }
   input{
+    margin: auto;
     margin-top: 1em;
     outline: none;
     background: var(--secondbg);
@@ -890,38 +942,40 @@ input[type="color"]::-webkit-color-swatch {
     font-size: 1rem;
     color: var(--main);
     padding: 0.5em;
-    width: 100%;
+    width: 90%;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
   }
 }
-.skills_container, .lang_container, .projects_container{
+.skills_container, .lang_container, .projects_container, .links_container, .edu_container{
   ul{
     list-style: none;
     display: flex;
-    justify-content: space-around;
-    align-items: center;
     margin: 0.5em 1em;
-    flex-basis: 50%;
+    flex-basis: auto;
     flex-wrap: wrap;
     li{
-      margin: 0.3em auto;
-      margin-left: 0.5em;
       background: var(--secondbg);
-      padding: 0.5em;
+      margin: 0.3em !important;
+      padding: 0.5em !important;
       border-radius: 1em;
       color: var(--main);
       width: fit-content;
+      display: inline;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      text-transform: capitalize;
       button{
         background: transparent;
         border: none;
         outline: none;
-        margin-left: 0.3em;
+        margin-left: 0.3em !important;
+        padding: 0 !important;
+        width: fit-content !important;
+        margin-top: 0 !important;
         cursor: pointer;
         i{
-          font-size: 1rem;
+          font-size: 1rem !important;
           background: transparent;
           color: var(--main);
           transition: all 1s ease;
@@ -941,6 +995,10 @@ input[type="color"]::-webkit-color-swatch {
   padding: 0.5em 1em;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
   cursor: pointer;
+}
+
+.download{
+  margin-left: 25% !important;
 }
       
 
@@ -977,10 +1035,10 @@ input[type="color"]::-webkit-color-swatch {
 ul,
 li{
     list-style: none;
-    margin: auto;
 }
 .info_list{
     text-align: left;
+    margin: auto;
 }
 .info_item{
     margin-top: 1em;
@@ -1030,10 +1088,14 @@ background: #3379ff;
     margin-right: 1em;
 }
 .skills_list{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  text-align: left;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  .skill{
     text-align: left;
+    width: 45%;
+  }
 }
 .flex{
     display: flex;
@@ -1043,19 +1105,16 @@ background: #3379ff;
 .skilles h1,
 .edu h1,
 .lang h1{
-    margin-bottom: 1em;
+    margin-bottom: 2em;
     text-align: center;
 }
 .skilles,
 .edu,
 .lang{
-    width: 300%;
+    width: 32%;
     text-align: left;
     margin: 1em 4em;
     padding: 0 2em;
-}
-.lang{
-    text-align: center;
 }
 .lang div{
     display: inline-block;
