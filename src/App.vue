@@ -769,7 +769,7 @@ export default {
 }
 body{
   background: var(--secondbg);
-  height: 100%;
+  overflow-x: hidden;
 }
 #app {
   font-family: 'Roboto', sans-serif;
@@ -789,16 +789,42 @@ input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none; 
   margin: 0; 
 }
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--bgcolor); 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--main);
+   
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondbg); 
+}
 .creator{
+  position: fixed;
   background: var(--bgcolor);
   min-height: 100vh;
   border-right: var(--main) 2px solid;
+  overflow-y: scroll;
+  top: 0;
+  bottom: 0;
+  width: 22vw;
+  scrollbar-width: 3px;
+  scrollbar-color: var(--main);
   .btn_main{
     width: fit-content;
     margin-left: 0.2em;
     margin: auto;
     margin-bottom: 1em;
-  } 
+  }
 }
 .creator_list{
   list-style: none;
@@ -1006,17 +1032,17 @@ input[type="color"]::-webkit-color-swatch {
 
 .resume_template{
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
     font-size: 15px;
     background: #ffffff;
     color: #000;
+    margin-left: 22vw;
+    width: 78vw;
+    min-height: 100vh;
+ 
 }
 .container{
     margin: 1em;
-    min-height: 90vh;
 }
 .container div{
     margin-top: 1em;
