@@ -20,7 +20,11 @@
             <input type="text" v-model="personalInfo.jobTittle" @keypress="beforeInput.firstPosition = false">
           </li>
           <li class="creator_item">
-            <label>Age</label>
+            <label>Address</label>
+            <input type="text" v-model="personalInfo.address">
+          </li>
+          <li class="creator_item">
+            <label>Date of Birth</label>
             <div class="dob_container">
               <select name="DOBDay" v-model="personalInfo.dob.day">
                 <option disabled>Day</option>
